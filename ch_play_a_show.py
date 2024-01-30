@@ -33,6 +33,20 @@ def read_json(json_file_path, instrument_filter=None):
 
     return data
 
+def append_to_playlist(song_title, artist, short_name):
+    playlist_path = "playlist.txt"
+    with open(playlist_path, "a", encoding='utf-8') as playlist_file:
+        playlist_file.write(f"{song_title} by {artist} (Charter: {short_name})\n")
+    print(f"Song added to the playlist: '{song_title}' by '{artist}' (Charter: {short_name})")
+
+def clear_playlist():
+    playlist_path = "playlist.txt"
+    if os.path.exists(playlist_path):
+        os.remove(playlist_path)
+        print("Playlist cleared.")
+    else:
+        print("Playlist is already empty.")
+
 def get_json_file_path(config):
     if config.has_option("Paths", "json_file_path"):
         json_file_path = config.get("Paths", "json_file_path")
@@ -64,9 +78,6 @@ def eval_random_song(data, song_title_index, artist_index, short_name_index):
     song = random.choice(data)
     return song[song_title_index], song[artist_index], song[short_name_index]
 
-def clear_playlist():
-    print("Clearing the playlist (removed output file functionality).")
-
 def get_random_song_from_artist(data, artist, song_title_index, artist_index):
     artist_songs = [song for song in data if song[artist_index] == artist]
 
@@ -84,28 +95,29 @@ def fuzzy_search(data, song_title_index, artist_index, year_index, genre_index, 
     else:
         config = None
 
+    selected_song_info = None
+
     # Check if it's a genre search
     if target_title.startswith('genre:'):
         genre_to_search = target_title[len('genre:'):].strip()
         genre_matches = [(row[song_title_index], row[artist_index], row[short_name_index]) for row in data if genre_to_search.lower() in row[genre_index].lower()]
 
         if genre_matches:
-            random_song_title, random_artist, random_short_name = random.choice(genre_matches)
-            print(f"Random song matching genre '{genre_to_search}': '{random_song_title}' by '{random_artist}'")
-        else:
-            print(f"No songs found in the genre '{genre_to_search}'.")
+            selected_song_info = random.choice(genre_matches)
+            random_song_title, random_artist, random_short_name = selected_song_info
+            print(f"Random song matching genre '{genre_to_search}'")
     elif target_title.startswith('year:'):
         year_to_search = target_title[len('year:'):].strip()
         year_matches = [(row[song_title_index], row[artist_index], row[short_name_index]) for row in data if year_to_search == row[year_index]]
 
         if year_matches:
-            random_song_title, random_artist, random_short_name = random.choice(year_matches)
-            print(f"Random song from the year '{year_to_search}': '{random_song_title}' by '{random_artist}'")
-        else:
-            print(f"No songs found in the year '{year_to_search}'.")
+            selected_song_info = random.choice(year_matches)
+            random_song_title, random_artist, random_short_name = selected_song_info
+            print(f"Random song from the year '{year_to_search}'")
     elif target_title == 'csv':
         song_title, artist = get_random_song(data, song_title_index, artist_index)
         print(f"Random song title from the CSV file: '{song_title}' by '{artist}'")
+        selected_song_info = (song_title, artist, "")
     else:
         matches = [(row[song_title_index], row[artist_index], row[short_name_index], score) for row in data for _, score in [process.extractOne(target_title, [row[song_title_index], row[artist_index]])]]
 
@@ -117,15 +129,20 @@ def fuzzy_search(data, song_title_index, artist_index, year_index, genre_index, 
         confirmation = input("Enter the number (1-5), 'n' to abort: ")
 
         if confirmation.lower() == 'y':
-            best_match, best_artist, best_short_name, _ = max(top_matches, key=lambda x: x[3])
+            selected_song_info = max(top_matches, key=lambda x: x[3])[:-1]
+            best_match, best_artist, best_short_name = selected_song_info
             print(f"Best match: '{best_match}' by '{best_artist}' (Score: {_})")
         elif confirmation.lower() == 'n':
             print("Operation aborted.")
         elif confirmation.isdigit() and 1 <= int(confirmation) <= 5:
-            selected_match, _, selected_short_name, _ = top_matches[int(confirmation) - 1]
+            selected_song_info = top_matches[int(confirmation) - 1][:-1]
+            selected_match, _, selected_short_name = selected_song_info
             print(f"Selected match: '{selected_match}' by '{best_artist}' (Score: {_})")
         else:
             print("Invalid input. Please enter 'y', 'n', 'genre:GenreName', 'year:Year', 'csv', or a number (1-5).")
+
+    return selected_song_info
+
 
 def refresh_options(data, song_title_index, artist_index, year_index, genre_index, short_name_index):
     year = get_random_year(data, year_index)
@@ -176,24 +193,28 @@ def main():
             print(f"4. A random {genre} song")
             print("5. Refresh options")
             print("6. Manual fuzzy search")
-            # print("7. Clear the playlist")
+            print("7. Clear the playlist")
             print("0. Exit")
 
             choice = input("Enter the number of your choice: ")
 
             if choice == '1':
                 fuzzy_search(data, song_title_index, artist_index, year_index, genre_index, short_name_index, None, f'year:{year}')
+                append_to_playlist(song_title, artist, short_name_direct)
                 year, artist, song_title, genre, song_title_direct, artist_direct, short_name_direct = refresh_options(data, song_title_index, artist_index, year_index, genre_index, short_name_index)
             elif choice == '2':
                 song_title, _ = get_random_song_from_artist(data, artist, song_title_index, artist_index)
                 if song_title:
                     print(f"Random song from {artist}: '{song_title}'")
+                    append_to_playlist(song_title, artist, "")
                 year, artist, song_title, genre, song_title_direct, artist_direct, short_name_direct = refresh_options(data, song_title_index, artist_index, year_index, genre_index, short_name_index)
             elif choice == '3':
                 print(f"Selected option 3: '{song_title_direct}' by '{artist_direct}'")
+                append_to_playlist(song_title_direct, artist_direct, short_name_direct)
                 year, artist, song_title, genre, song_title_direct, artist_direct, short_name_direct = refresh_options(data, song_title_index, artist_index, year_index, genre_index, short_name_index)
             elif choice == '4':
                 fuzzy_search(data, song_title_index, artist_index, year_index, genre_index, short_name_index, None, f'genre:{genre}')
+                append_to_playlist(song_title, artist, short_name_direct)
                 year, artist, song_title, genre, song_title_direct, artist_direct, short_name_direct = refresh_options(data, song_title_index, artist_index, year_index, genre_index, short_name_index)
             elif choice == '5':
                 print("Options refreshed.")
