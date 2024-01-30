@@ -1,5 +1,6 @@
 import csv
 import random
+import argparse
 from fuzzywuzzy import process
 import os
 import configparser
@@ -134,6 +135,10 @@ def refresh_options(data, song_title_index, artist_index, year_index, genre_inde
     return year, artist, song_title, genre, song_title_direct, artist_direct, short_name_direct
 
 def main():
+    parser = argparse.ArgumentParser(description="Clone Hero Play A Show")
+    parser.add_argument("--instrument_filter", help="Filter songs based on instrument")
+    args = parser.parse_args()
+
     config = configparser.ConfigParser()
     config_file_path = "config.ini"
 
@@ -149,7 +154,7 @@ def main():
         config.read(config_file_path)
         json_file_path = get_json_file_path(config)
 
-    data = read_json(json_file_path)
+    data = read_json(json_file_path, instrument_filter=args.instrument_filter)
 
     if data:
         song_title_index = "Name"
