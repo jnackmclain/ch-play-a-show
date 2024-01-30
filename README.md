@@ -32,9 +32,13 @@ This application does not interface with Clone Hero in any way, only reads the s
    python ch_play_a_show.py --instrument_filter keys
    ```
    Replace keys with the desired instrument filter (optional).
-   Available filters = "guitar", "bass", "rhythm", "guitar_coop", "ghl_guitar", "ghl_bass", "drums", "keys", "band", "pro_drums"
 
-3. **Follow the on-screen menu to choose from various song selection options.**
+   Available filters =
+   ```bash
+   "guitar", "bass", "rhythm", "guitar_coop", "ghl_guitar", "ghl_bass", "drums", "keys", "band", "pro_drums"
+   ```
+   
+4. **Follow the on-screen menu to choose from various song selection options.**
 
    ```bash
    # Example Run:
@@ -48,6 +52,7 @@ This application does not interface with Clone Hero in any way, only reads the s
    4. A random {genre} song
    5. Refresh options
    6. Manual fuzzy search
+   7. Clear the playlist
    0. Exit
 
    Enter the number of your choice:
@@ -56,3 +61,4 @@ This application does not interface with Clone Hero in any way, only reads the s
 ## Configuration
 The script uses a configuration file (config.ini) to store the path to the Clone Hero songs.json.
 If the configuration file is not found, the script will prompt you to enter the Clone Hero songs.json file path.
+A playlist.txt is generated to store the selected options
