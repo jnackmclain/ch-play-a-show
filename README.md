@@ -52,6 +52,7 @@ This application does not interface with Clone Hero in any way, only reads the s
    4. A random {genre} song
    5. Refresh options
    6. Manual fuzzy search
+   7. Clear the playlist
    0. Exit
 
    Enter the number of your choice:
@@ -60,3 +61,4 @@ This application does not interface with Clone Hero in any way, only reads the s
 ## Configuration
 The script uses a configuration file (config.ini) to store the path to the Clone Hero songs.json.
 If the configuration file is not found, the script will prompt you to enter the Clone Hero songs.json file path.
+A playlist.txt is generated to store the selected options
