@@ -35,17 +35,27 @@ def read_json(json_file_path, instrument_filter=None):
 
 def append_to_playlist(song_title, artist, short_name):
     playlist_path = "playlist.txt"
+    
+    if short_name:  # Only include Charter information if available
+        playlist_line = f"{song_title} by {artist} (Charter: {short_name})"
+    else:
+        playlist_line = f"{song_title} by {artist}"
+    
     with open(playlist_path, "a", encoding='utf-8') as playlist_file:
-        playlist_file.write(f"{song_title} by {artist} (Charter: {short_name})\n")
-    print(f"Song added to the playlist: '{song_title}' by '{artist}' (Charter: {short_name})")
+        playlist_file.write(f"{playlist_line}\n")
+    
+    print(f"Song added to the playlist: '{song_title}' by '{artist}' (Charter: {short_name})" if short_name else
+          f"Song added to the playlist: '{song_title}' by '{artist}'")
 
 def clear_playlist():
     playlist_path = "playlist.txt"
-    if os.path.exists(playlist_path):
-        os.remove(playlist_path)
-        print("Playlist cleared.")
-    else:
-        print("Playlist is already empty.")
+    
+    # Open the playlist file in write mode to clear its contents
+    with open(playlist_path, "w", encoding='utf-8'):
+        pass
+    
+    print("Playlist cleared.")
+
 
 def get_json_file_path(config):
     if config.has_option("Paths", "json_file_path"):
