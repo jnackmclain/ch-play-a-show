@@ -22,12 +22,12 @@ def read_json(json_file_path, instrument_filter=None):
         instrument_names = ["guitar", "bass", "rhythm", "guitar_coop", "ghl_guitar", "ghl_bass", "drums", "keys", "band", "pro_drums"]
         instrument_index = instrument_names.index(instrument_filter)
         if instrument_index < 0:
-            # TODO: handle error
-            pass
-
-        # Create a mask with 1s at positions corresponding to difficulties
-        instrument_mask = 0x0F << (instrument_index * 4)
-        # print(f"Instrument Mask: {bin(instrument_mask)}")
+            print(f"Invalid instrument filter {instrument_filter}")
+            exit() # remove if you want to continue normally
+        else:
+            # Create a mask with 1s at positions corresponding to difficulties
+            instrument_mask = 0x0F << (instrument_index * 4)
+            # print(f"Instrument Mask: {bin(instrument_mask)}")
 
         data = [song for song in data if (int(song.get('chartsAvailable', 0)) & instrument_mask) != 0]
 
