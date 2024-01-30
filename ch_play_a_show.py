@@ -25,11 +25,13 @@ def read_json(json_file_path, instrument_filter=None):
             # TODO: handle error
             pass
 
-        instrument_mask = 0x0F << instrument_index
+        # Create a mask with 1s at positions corresponding to difficulties
+        instrument_mask = 0x0F << (instrument_index * 4)
+        # print(f"Instrument Mask: {bin(instrument_mask)}")
+
         data = [song for song in data if (int(song.get('chartsAvailable', 0)) & instrument_mask) != 0]
 
     return data
-
 
 def get_json_file_path(config):
     if config.has_option("Paths", "json_file_path"):
