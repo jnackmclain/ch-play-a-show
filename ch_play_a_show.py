@@ -18,13 +18,17 @@ def read_json(json_file_path, instrument_filter=None):
 
     # Filter data based on the specified instrument
     if instrument_filter:
-        instrument_names = ["Guitar", "Bass", "Rhythm", "GuitarCoop", "GHLGuitar", "GHLBass", "Drums", "Keys", "Band", "ProDrums"]
+        instrument_names = ["guitar", "bass", "rhythm", "guitar_coop", "ghl_guitar", "ghl_bass", "drums", "keys", "band", "pro_drums"]
         instrument_index = instrument_names.index(instrument_filter)
-        instrument_bit = 1 << (instrument_index * 4 + 3)  # Use the highest bit in the group
+        if instrument_index < 0:
+            # TODO: handle error
+            pass
 
-        data = [song for song in data if (int(song.get('chartsAvailable', 0)) & instrument_bit) != 0]
+        instrument_mask = 0x0F << instrument_index
+        data = [song for song in data if (int(song.get('chartsAvailable', 0)) & instrument_mask) != 0]
 
     return data
+
 
 def get_json_file_path(config):
     if config.has_option("Paths", "json_file_path"):
@@ -145,7 +149,7 @@ def main():
         config.read(config_file_path)
         json_file_path = get_json_file_path(config)
 
-    data = read_json(json_file_path, instrument_filter="ProDrums")
+    data = read_json(json_file_path)
 
     if data:
         song_title_index = "Name"
