@@ -32,9 +32,13 @@ This application does not interface with Clone Hero in any way, only reads the s
    python ch_play_a_show.py --instrument_filter keys
    ```
    Replace keys with the desired instrument filter (optional).
-   Available filters = "guitar", "bass", "rhythm", "guitar_coop", "ghl_guitar", "ghl_bass", "drums", "keys", "band", "pro_drums"
 
-3. **Follow the on-screen menu to choose from various song selection options.**
+   Available filters =
+   ```bash
+   "guitar", "bass", "rhythm", "guitar_coop", "ghl_guitar", "ghl_bass", "drums", "keys", "band", "pro_drums"
+   ```
+   
+4. **Follow the on-screen menu to choose from various song selection options.**
 
    ```bash
    # Example Run:
